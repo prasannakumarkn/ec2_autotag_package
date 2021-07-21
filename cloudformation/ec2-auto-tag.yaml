@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudWatch Event rule to capture EC2 run instances
+
+Parameters:
+  LambdaRoleName:
+    Description: IAM Role name for Lambda
+    Type: String
+  EventBridgeRuleName:
+    Description: Event bridge rule name
+    Type: String
+  LambdaFunctionName:
+    Description: Lambda Function Name
+    Type: String
+
+Resources:
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # CloudWatch Event rules which will trigger lambda function
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  RuleForEC2tagging:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: !Ref EventBridgeRuleName
+      Description: "While EC2 instance is launched, This rule will trigger"
+      EventPattern:
+        source:
+          - aws.ec2
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          eventName:
+          - RunInstances
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt AutotaggingLambda.Arn
+          Id: "TargetFunctionV1"
+
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # Permission to be added to the lambda for FunctionToTagEC2
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  PermissionForEventsToInvokeLambda:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !GetAtt AutotaggingLambda.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt RuleForEC2tagging.Arn
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # IAM Role for lambda
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  LambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Ref LambdaRoleName
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ec2:CreateTags"
+                  - "ec2:DescribeImages"
+                Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # Lambda function to tag the AMIs
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  AutotaggingLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      Code:
+        ZipFile: |
+                  import json
+                  import boto3
+
+                  def lambda_handler(event, context):
+                      try:
+                          print(event)
+                          items = event["detail"]["responseElements"]["instancesSet"]["items"]
+                          region = event["detail"]["awsRegion"]
+                          LaunchedBy = event["detail"]['userIdentity']['arn']
+                          for item in items:
+                              instanceid= item['instanceId']
+                              amiid = item['imageId']
+                              ec2client = boto3.client('ec2', region_name = region)
+                              response= ec2client.describe_images( ImageIds=[amiid])
+                              AMI_Name= response['Images'][0]['Name']
+                              ec2client.create_tags(
+                                  Resources=[
+                                      instanceid,
+                                  ],
+                                  Tags=[
+                                      {
+                                          'Key': 'OS_Name',
+                                          'Value': AMI_Name
+                                      },
+                                      {
+                                          'Key': 'LaunchedBy',
+                                          'Value': LaunchedBy
+                                      },
+                                  ]
+                              )
+                      except Exception as e:
+                          print(e)
+      Description: Custome AMI Tagging
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: python3.7
+      Timeout: 900
