@@ -30,9 +30,10 @@ jobs:
           args: "cloudformation/**/*.yaml"
 
       - name: cfn-nag-action
-        uses: minchao/cfn-nag-action@v0.1
+        uses: stelligent/cfn_nag@master
         with:
-          args: "--input-path cloudformation/"
+          input_path: cloudformation/ec2-auto-tag.yaml
+          extra_args: --fail-on-warnings -o json
 
       - name: cfn-artifacts
         uses: actions/upload-artifact@v1
