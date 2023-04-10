@@ -24,8 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: cfn-nag-action
-        uses: stelligent/cfn_nag@v0.8.6
-          #args: "--input-path cloudformation/"
+        uses: stelligent/cfn_nag@master
+      - name: scan-cloudformation
+        run: cfn_nag_scan --input-path cloudformation/ec2-auto-tag.yaml
       - name: cfn-lint-action
         uses: ScottBrenner/cfn-lint-action@1.6.1
         with:
