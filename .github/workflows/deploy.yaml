@@ -24,9 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: cfn-nag-action
-        uses: minchao/cfn-nag-action@v0.1
-        with:
-          args: "--input-path cloudformation/"
+        uses: stelligent/cfn_nag@v0.8.6
+          #args: "--input-path cloudformation/"
       - name: cfn-lint-action
         uses: ScottBrenner/cfn-lint-action@1.6.1
         with:
