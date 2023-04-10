@@ -27,8 +27,7 @@ jobs:
         uses: stelligent/cfn_nag@master
         with:
           input_path: cloudformation/template
-# #           extra_args: 
-# #             ""
+          extra_args: "--input-path cloudformation/template"
 #       - name: cfn-nag-action
 #         uses: minchao/cfn-nag-action@v0.1
 #         with:
