@@ -23,15 +23,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: cfn-nag-action
-        uses: stelligent/cfn_nag@master
-        with:
-          input_path: cloudformation/template
-          extra_args: --fail-on-warnings -o json
 #       - name: cfn-nag-action
-#         uses: minchao/cfn-nag-action@v0.1
+#         uses: stelligent/cfn_nag@master
 #         with:
-#           args: "--input-path cloudformation/template"
+#           input_path: cloudformation/template
+#           extra_args: --fail-on-warnings -o json
+      - name: cfn-nag-action
+        uses: minchao/cfn-nag-action@v0.1
+        with:
+          args: "--input-path cloudformation/template"
 #       - name: cfn-lint-action
 #         uses: ScottBrenner/cfn-lint-action@1.6.1
 #         with:
