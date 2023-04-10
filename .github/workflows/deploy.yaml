@@ -29,7 +29,7 @@ jobs:
 #           input_path: cloudformation/template
 #           extra_args: --fail-on-warnings -o json
       - name: cfn-nag-action
-        uses: minchao/cfn-nag-action@v0.1
+        uses: minchao/cfn-nag-action@master
         with:
           args: "--input-path cloudformation/template"
 #       - name: cfn-lint-action
