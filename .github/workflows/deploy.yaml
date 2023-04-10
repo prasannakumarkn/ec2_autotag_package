@@ -29,9 +29,10 @@ jobs:
 #           input_path: cloudformation/template
 # #           extra_args: 
 # #             ""
-            
-      - name: scan-cloudformation
-        run: cfn_nag_scan --input-path cloudformation/template
+      - name: cfn-nag-action
+        uses: minchao/cfn-nag-action@v0.1
+        with:
+          args: "--input-path cloudformation/template"
 #       - name: cfn-lint-action
 #         uses: ScottBrenner/cfn-lint-action@1.6.1
 #         with:
