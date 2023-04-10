@@ -26,7 +26,7 @@ jobs:
       - name: cfn-nag-action
         uses: stelligent/cfn-nag-sarif-action@v1
         with:
-          input_path: cloudformation/ec2-auto-tag.yaml
+          input_path: cloudformation
           extra_args: --fail-on-warnings -o json
       - name: cfn-lint-action
         uses: ScottBrenner/cfn-lint-action@1.6.1
