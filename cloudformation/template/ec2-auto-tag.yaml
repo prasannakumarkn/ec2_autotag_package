@@ -66,9 +66,9 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Action:
-                 - "ec2:CreateTags"
-                 - "ec2:DescribeImages"
+                Action: "*"
+#                  - "ec2:CreateTags"
+#                  - "ec2:DescribeImages"
                 Resource: "*"
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
