@@ -23,17 +23,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: cfn-lint-action
-        uses: ScottBrenner/cfn-lint-action@1.6.1
-        with:
-          args: "cloudformation/**/*.yaml"
-
       - name: cfn-nag-action
         uses: stelligent/cfn_nag@master
         with:
           input_path: cloudformation/ec2-auto-tag.yaml
           extra_args: --fail-on-warnings -o json
+      - name: cfn-lint-action
+        uses: ScottBrenner/cfn-lint-action@1.6.1
+        with:
+          args: "cloudformation/**/*.yaml"
 
       - name: cfn-artifacts
         uses: actions/upload-artifact@v1
