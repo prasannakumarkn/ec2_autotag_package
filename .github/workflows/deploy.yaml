@@ -26,7 +26,7 @@ jobs:
       - name: cfn-nag-action
         uses: stelligent/cfn_nag@master
         with:
-          input_path: cloudformation
+          input_path: cloudformation/template
           extra_args: ""
 #       - name: scan-cloudformation
 #         run: cfn_nag_scan --input-path cloudformation/ec2-auto-tag.yaml
